@@ -43,10 +43,27 @@ buttonRootId: 'ton-connect-button'
 </div>
 
 <script>
-    function prepararPago(monto) {
-        alert('Has seleccionado el plan de ' + monto + ' USDT.\nDestino: ' + MY_WALLET);
-    }
-</script>
+  async function prepararPago(monto) {
+        if (!tonConnectUI.connected) {
+            alert("Primero conecta tu billetera con el botón de arriba.");
+            tonConnectUI.openModal();
+            return;
+        }
 
-</body>
-</html>
+        const transaction = {
+            validUntil: Math.floor(Date.now() / 1000) + 60, // 60 segundos para firmar
+            messages: [
+                {
+                    address: MY_WALLET, // Tu billetera UQCT...8Vic
+                    amount: "10000000", // Esto es 0.01 TON (Prueba mínima)
+                }
+            ]
+        };
+
+        try {
+            await tonConnectUI.sendTransaction(transaction);
+            alert("¡Excelente! Se ha solicitado el envío de prueba a tu billetera.");
+        } catch (e) {
+            alert("La transacción fue cancelada o hubo un error.");
+        }
+    }
