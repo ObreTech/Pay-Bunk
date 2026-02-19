@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay Bunk Staking</title>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #0f172a; color: white; text-align: center; padding-top: 50px; }
+        .card { background: #1e293b; border-radius: 20px; padding: 30px; margin: auto; max-width: 350px; border: 1px solid #334155; }
+        h1 { color: #38bdf8; }
+        #ton-connect-button { display: flex; justify-content: center; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🚀 PAY BUNK</h1>
+        <p>Staking de USDT</p>
+        <div id="ton-connect-button"></div>
+        <p style="font-size: 12px; color: #94a3b8;">Conecta tu billetera para empezar</p>
+    </div>
+    <script>
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://pay-bunk-app.vercel.app/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-button'
+        });
+    </script>
+</body>
+</html>
