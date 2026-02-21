@@ -34,7 +34,7 @@ buttonRootId: 'ton-connect-button'
     <h3 style="color: white; margin-bottom: 20px;">Selecciona tu Plan de Staking</h3>
     
     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 10px; max-width: 400px; margin: 0 auto;">
-     <button onclick="console.log('Click!'); prepararPago(10);">10 USDT</button>
+     <button onclick="alert('Paso 1: Botón detectado'); prepararPago(10);">10 USDT</button>
         <button onclick="prepararPago(50)" style="padding: 15px; background: #0088cc; color: white; border: none; border-radius: 8px; width: 110px; font-weight: bold; cursor: pointer;">50 USDT</button>
         <button onclick="prepararPago(100)" style="padding: 15px; background: #0088cc; color: white; border: none; border-radius: 8px; width: 110px; font-weight: bold; cursor: pointer;">100 USDT</button>
         <button onclick="prepararPago(1000)" style="padding: 15px; background: #0088cc; color: white; border: none; border-radius: 8px; width: 110px; font-weight: bold; cursor: pointer;">1000 USDT</button>
@@ -43,34 +43,30 @@ buttonRootId: 'ton-connect-button'
 </div>
 
 <script>
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
-        buttonRootId: 'ton-connect-button'
-    });
+    // Definimos la variable fuera para que sea global
+    let tonConnectUI;
+
+    try {
+        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-button'
+        });
+    } catch (err) {
+        console.error("Error al cargar TonConnect:", err);
+    }
 
     async function prepararPago(monto) {
-        alert("Iniciando pago de " + monto + " USDT. Abre tu billetera...");
-
-        if (!tonConnectUI.connected) {
-            tonConnectUI.openModal();
+        alert("Paso 2: Entraste a la función para " + monto + " USDT");
+        
+        if (!tonConnectUI) {
+            alert("Error: La conexión con la billetera no se cargó.");
             return;
         }
 
-        const transaction = {
-            validUntil: Math.floor(Date.now() / 1000) + 300,
-            messages: [
-                {
-                    address: "EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L", // Contrato USDT
-                    amount: "50000000", // 0.05 TON para GAS
-                    payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
-                }
-            ]
-        };
-
-        try {
-            await tonConnectUI.sendTransaction(transaction);
-        } catch (e) {
-            alert("Error: " + e.message);
+        alert("Paso 3: Todo parece estar en orden. Intentando conectar...");
+        
+        if (!tonConnectUI.connected) {
+            tonConnectUI.openModal();
         }
     }
 </script>
