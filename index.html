@@ -53,47 +53,40 @@
             buttonRootId: 'ton-connect-button'
         });
 
-        async function pagar(monto) {
-            console.log("Iniciando proceso para " + monto + " USDT");
+       async function pagar(monto) {
+    if (!tonConnectUI.connected) {
+        alert("Primero conecta tu billetera.");
+        await tonConnectUI.openModal();
+        return;
+    }
 
-            if (!tonConnectUI.connected) {
-                alert("Compañero, primero conecta tu billetera arriba.");
-                await tonConnectUI.openModal();
-                return;
+    // Dirección del contrato USDT en formato RAW (Esto evita el error de formato)
+    const USDT_CONTRACT_RAW = "0:c413a98d66177da4fe17dfbe3ec7efdfdc7e47af333333333333333333333333";
+    
+    // Dirección de tu billetera de destino (la tuya)
+    const MI_BILLETERA = "UQCT67yhgE0nbSjW-yTIcOp-KJtcT7h1ebc1Sr0EK7Tn8Vic";
+
+    const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 360,
+        messages: [
+            {
+                address: USDT_CONTRACT_RAW, // Usamos el formato RAW aquí
+                amount: "50000000", // 0.05 TON para el gas
+                // Este payload es la instrucción de transferencia
+                payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
             }
+        ]
+    };
 
-            // Datos de tu billetera y el contrato USDT
-            const TU_BILLETERA = "UQCT67yhgE0nbSjW-yTIcOp-KJtcT7h1ebc1Sr0EK7Tn8Vic";
-            const CONTRATO_USDT = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
-
-            // Mensaje de advertencia amigable
-            alert("Vas a invertir " + monto + " USDT. Por favor, confirma la transacción en tu billetera.");
-
-            const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 360,
-                messages: [
-                    {
-                        address: CONTRATO_USDT,
-                        amount: "50000000", // 0.05 TON para el gas
-                        // Payload de transferencia genérico para Jettons
-                        payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
-                    }
-                ]
-            };
-
-            try {
-                const result = await tonConnectUI.sendTransaction(transaction);
-                alert("¡Éxito! Transacción enviada correctamente.");
-                console.log("Resultado:", result);
-            } catch (e) {
-                console.error("Error al pagar:", e);
-                alert("La operación falló: " + (e.message || "Cancelada por el usuario"));
-            }
-        }
-    </script>
-</body>
-</html>
-
+    try {
+        await tonConnectUI.sendTransaction(transaction);
+        alert("¡Procesando inversión de " + monto + " USDT!");
+    } catch (e) {
+        console.error(e);
+        // Si el error persiste, lo mostramos para ver qué dice
+        alert("Error: " + e.message);
+    }
+}
 
 
 
