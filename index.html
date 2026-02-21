@@ -43,9 +43,16 @@ buttonRootId: 'ton-connect-button'
 </div>
 
 <script>
-async function prepararPago(monto) {
-        // MENSAJE MÉDICO: Si ves este cartel, el botón funciona.
-        alert("Iniciando pago de: " + monto + " USDT");
+    // 1. CONEXIÓN CON LA BILLETERA
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect-button'
+    });
+
+    // 2. FUNCIÓN PARA PROCESAR EL PAGO (10, 50, 100, 1000, 3000 USDT)
+    async function prepararPago(monto) {
+        // Este cartel te confirma que el botón funciona
+        alert("Iniciando inversión de: " + monto + " USDT");
 
         if (!tonConnectUI.connected) {
             alert("Por favor, conecta tu billetera primero.");
@@ -54,35 +61,25 @@ async function prepararPago(monto) {
         }
 
         try {
-            // 1. Monto en unidades USDT
-            const usdtAmount = (monto * 1000000).toString();
-            
-            // 2. Dirección de cobro (TU BILLETERA)
-            const miBilletera = "UQA9H_3m6_xXyW9M3W9M3W9M3W9M3W9M3W9M3W9M3W9M38Vic";
-
-            // 3. Instrucción técnica (Payload)
-            const body = "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA";
-
             const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 600,
+                validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutos
                 messages: [
                     {
                         address: "EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L", // Contrato USDT
-                        amount: "60000000", // Gas en TON (0.06)
-                        payload: body
+                        amount: "60000000", // Gas (0.06 TON)
+                        payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
                     }
                 ]
             };
 
-            console.log("Enviando transacción...", transaction);
             await tonConnectUI.sendTransaction(transaction);
-            alert("Transacción enviada con éxito.");
-
+            alert("✅ Transacción enviada a la billetera.");
         } catch (e) {
-            console.error("Error detallado:", e);
-            alert("Error en la operación: " + e.message);
+            alert("❌ Error: " + e.message);
         }
     }
+</script>
+
 
 
 
