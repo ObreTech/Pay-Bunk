@@ -68,58 +68,44 @@ buttonRootId: 'ton-connect-button'
 
 <div id="ton-connect-button" style="display: flex; justify-content: center; padding: 20px;"></div>
 
-<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-    <button onclick="prepararPago(10)">10 USDT</button>
-    <button onclick="prepararPago(50)">50 USDT</button>
-    <button onclick="prepararPago(100)">100 USDT</button>
-    <button onclick="prepararPago(1000)">1000 USDT</button>
-    <button onclick="prepararPago(3000)">3000 USDT</button>
+<div id="ton-connect-button"></div>
+
+<hr> <div class="payment-section">
+    <button class="pay-btn" onclick="ejecutarPago(10)">Pagar 10 USDT</button>
+    <button class="pay-btn" onclick="ejecutarPago(50)">Pagar 50 USDT</button>
+    <button class="pay-btn" onclick="ejecutarPago(100)">Pagar 100 USDT</button>
+    <button class="pay-btn" onclick="ejecutarPago(1000)">Pagar 1000 USDT</button>
+    <button class="pay-btn" onclick="ejecutarPago(3000)">Pagar 3000 USDT</button>
+</div>
+
+
+  <div id="ton-connect-button"></div> <div class="botones-pago">
+    <button onclick="pagar(10)">10 USDT</button>
+    <button onclick="pagar(50)">50 USDT</button>
+    <button onclick="pagar(100)">100 USDT</button>
+    <button onclick="pagar(1000)">1000 USDT</button>
+    <button onclick="pagar(3000)">3000 USDT</button>
 </div>
 
 <script>
-    // Usamos 'var' para que la variable exista desde el segundo 0
-    var tonConnectUI;
+    // Si esto se ve de colores en tu editor, vas por buen camino
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://tu-sitio.com/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect-button'
+    });
 
-    // Esta función se encarga de crear el botón apenas carga la página
-    function iniciarBilletera() {
-        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-button'
-        });
-    }
-
-    // Ejecutamos la carga inmediatamente
-    iniciarBilletera();
-
-    // Función para los pagos
-    async function prepararPago(monto) {
-        if (!tonConnectUI) {
-            alert("El sistema se está iniciando. Por favor espera 3 segundos.");
-            return;
-        }
-
+    async function pagar(monto) {
+        console.log("Iniciando pago de: " + monto + " USDT");
+        
         if (!tonConnectUI.connected) {
-            alert("Por favor, conecta tu billetera primero con el botón azul.");
-            tonConnectUI.openModal();
+            alert("Error: La Wallet no está conectada.");
             return;
         }
 
-        try {
-            const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 600,
-                messages: [{
-                    address: "EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L", // Tu contrato USDT
-                    amount: "60000000", // Gas
-                    payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
-                }]
-            };
-            await tonConnectUI.sendTransaction(transaction);
-        } catch (e) {
-            alert("Error: " + e.message);
-        }
+        // Aquí la lógica para Web3/USDT que ya tenemos
+        alert("Procesando pago de " + monto + " USDT en la red TON...");
     }
-</script>
-
+</script>  
 
 
 
