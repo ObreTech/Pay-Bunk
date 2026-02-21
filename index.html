@@ -46,31 +46,33 @@
         <p class="footer-info">Red TON | Solo USDT aceptado</p>
     </div>
 
-  <script>
-    // 1. Inicialización de TonConnect
+ <script>
+    // 1. Inicialización limpia de TonConnect
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
         manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
         buttonRootId: 'ton-connect-button'
     });
 
-    // 2. Función de pago corregida (Evita el error de "Wrong address")
+    // 2. Función de pago blindada
     async function pagar(monto) {
+        console.log("Iniciando pago por: " + monto);
+        
         if (!tonConnectUI.connected) {
-            alert("Compañero, primero conecta tu billetera arriba.");
+            alert("Compañero, primero conecta tu billetera.");
             await tonConnectUI.openModal();
             return;
         }
 
-        // Dirección del contrato USDT en formato RAW (Para que no falle el formato)
-        const USDT_CONTRACT_RAW = "0:c413a98d66177da4fe17dfbe3ec7efdfdc7e47af333333333333333333333333";
-        
+        // Esta es la dirección del contrato de USDT (Master) que la billetera debe reconocer
+        const USDT_MASTER_ADDRESS = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
+
         const transaction = {
             validUntil: Math.floor(Date.now() / 1000) + 360,
             messages: [
                 {
-                    address: USDT_CONTRACT_RAW, 
-                    amount: "50000000", // 0.05 TON para el gas
-                    // Instrucción de transferencia para USDT
+                    address: USDT_MASTER_ADDRESS,
+                    amount: "50000000", // 0.05 TON para el gas (fee de red)
+                    // Payload estándar para transferencia de USDT
                     payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
                 }
             ]
@@ -78,13 +80,13 @@
 
         try {
             await tonConnectUI.sendTransaction(transaction);
-            alert("¡Transacción enviada! Verificando inversión de " + monto + " USDT.");
+            alert("¡Transacción enviada! Verificando tus " + monto + " USDT.");
         } catch (e) {
-            alert("Error en la operación: " + e.message);
+            console.error("Detalle del error:", e);
+            alert("Error de validación: Por favor, asegúrate de tener al menos 0.1 TON para pagar la comisión de red.");
         }
     }
 </script>
-
 
 
 
