@@ -64,64 +64,49 @@ buttonRootId: 'ton-connect-button'
    
   <div id="ton-connect-button" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
 
-<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 10px;">
-    <button onclick="prepararPago(10)" style="padding: 12px 20px; border-radius: 8px; cursor: pointer;">10 USDT</button>
-    <button onclick="prepararPago(50)" style="padding: 12px 20px; border-radius: 8px; cursor: pointer;">50 USDT</button>
-    <button onclick="prepararPago(100)" style="padding: 12px 20px; border-radius: 8px; cursor: pointer;">100 USDT</button>
-    <button onclick="prepararPago(1000)" style="padding: 12px 20px; border-radius: 8px; cursor: pointer;">1000 USDT</button>
-    <button onclick="prepararPago(3000)" style="padding: 12px 20px; border-radius: 8px; cursor: pointer;">3000 USDT</button>
+<div id="ton-connect-button" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+    <button onclick="prepararPago(10)">10 USDT</button>
+    <button onclick="prepararPago(50)">50 USDT</button>
+    <button onclick="prepararPago(100)">100 USDT</button>
+    <button onclick="prepararPago(1000)">1000 USDT</button>
+    <button onclick="prepararPago(3000)">3000 USDT</button>
 </div>
 
 <script>
-    // VARIABLE GLOBAL
-    let tonConnectUI;
+    // Primero encendemos el motor (Esto hará que el botón azul aparezca)
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect-button'
+    });
 
-    // FUNCIÓN DE INICIALIZACIÓN (Se ejecuta sola al cargar la página)
-    (function motorPrincipal() {
-        try {
-            tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
-                buttonRootId: 'ton-connect-button'
-            });
-            console.log("Motor TON encendido");
-        } catch (e) {
-            console.error("Error al iniciar motor:", e);
-        }
-    })();
-
-    // FUNCIÓN DE PAGO (La que usan todos los botones)
+    // Ahora definimos qué hacen los botones de USDT
     async function prepararPago(monto) {
-        if (!tonConnectUI) {
-            alert("El sistema se está iniciando, espera 2 segundos.");
-            return;
-        }
-
         if (!tonConnectUI.connected) {
-            alert("Primero conecta tu billetera con el botón azul.");
-            await tonConnectUI.openModal();
+            alert("Primero conecta tu billetera con el botón azul arriba.");
+            tonConnectUI.openModal();
             return;
         }
 
-        alert("Iniciando inversión de " + monto + " USDT...");
+        alert("Abriendo billetera para invertir " + monto + " USDT...");
 
-        const transaction = {
+        const tx = {
             validUntil: Math.floor(Date.now() / 1000) + 600,
             messages: [{
                 address: "EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L", // Contrato USDT
-                amount: "60000000", // 0.06 TON para el envío
+                amount: "60000000", // Gas en TON
                 payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
             }]
         };
 
         try {
-            await tonConnectUI.sendTransaction(transaction);
+            await tonConnectUI.sendTransaction(tx);
         } catch (e) {
-            alert("Operación cancelada o error: " + e.message);
+            alert("Error: " + e.message);
         }
     }
 </script>
-
-
 
 
 
