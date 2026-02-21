@@ -34,7 +34,7 @@ buttonRootId: 'ton-connect-button'
     <h3 style="color: white; margin-bottom: 20px;">Selecciona tu Plan de Staking</h3>
     
     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 10px; max-width: 400px; margin: 0 auto;">
-     <button onclick="alert('Paso 1: Botón detectado'); prepararPago(10);">10 USDT</button>
+     <button onclick="prepararPago(10);">10 USDT</button>
         <button onclick="prepararPago(50)" style="padding: 15px; background: #0088cc; color: white; border: none; border-radius: 8px; width: 110px; font-weight: bold; cursor: pointer;">50 USDT</button>
         <button onclick="prepararPago(100)" style="padding: 15px; background: #0088cc; color: white; border: none; border-radius: 8px; width: 110px; font-weight: bold; cursor: pointer;">100 USDT</button>
         <button onclick="prepararPago(1000)" style="padding: 15px; background: #0088cc; color: white; border: none; border-radius: 8px; width: 110px; font-weight: bold; cursor: pointer;">1000 USDT</button>
@@ -43,33 +43,38 @@ buttonRootId: 'ton-connect-button'
 </div>
 
 <script>
-    // Definimos la variable fuera para que sea global
-    let tonConnectUI;
-
-    try {
-        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-button'
-        });
-    } catch (err) {
-        console.error("Error al cargar TonConnect:", err);
-    }
+    // 1. Iniciamos la conexión
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect-button'
+    });
 
     async function prepararPago(monto) {
-        alert("Paso 2: Entraste a la función para " + monto + " USDT");
-        
-        if (!tonConnectUI) {
-            alert("Error: La conexión con la billetera no se cargó.");
+        // Si ves este cartel, habremos arreglado el "puente"
+        alert("Paso 2: ¡La función responde! Monto: " + monto);
+
+        if (!tonConnectUI.connected) {
+            alert("Paso 3: Conectando billetera...");
+            await tonConnectUI.openModal();
             return;
         }
 
-        alert("Paso 3: Todo parece estar en orden. Intentando conectar...");
-        
-        if (!tonConnectUI.connected) {
-            tonConnectUI.openModal();
+        try {
+            const tx = {
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [{
+                    address: "EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L",
+                    amount: "50000000",
+                    payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
+                }]
+            };
+            await tonConnectUI.sendTransaction(tx);
+        } catch (e) {
+            alert("Error en transacción: " + e.message);
         }
     }
 </script>
+
 
 
 
