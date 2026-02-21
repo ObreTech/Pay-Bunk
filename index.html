@@ -57,31 +57,59 @@ buttonRootId: 'ton-connect-button'
     const USDT_CONTRACT = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
 </script>
 
-<div id="ton-connect-button"></div> <div class="botones-pago">
-    <button onclick="pagar(10)">10 USDT</button>
-    <button onclick="pagar(50)">50 USDT</button>
-    <button onclick="pagar(100)">100 USDT</button>
-    <button onclick="pagar(1000)">1000 USDT</button>
-    <button onclick="pagar(3000)">3000 USDT</button>
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+
+<style>
+    #ton-connect-button { 
+        margin-bottom: 20px; 
+        display: flex; 
+        justify-content: center; 
+    }
+    .contenedor-pagos {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    .btn-usdt {
+        background-color: #0088cc; /* Azul TON */
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .btn-usdt:hover { background-color: #005580; }
+</style>
+
+<div id="ton-connect-button"></div>
+
+<div class="contenedor-pagos">
+    <button class="btn-usdt" onclick="pagar(10)">Pagar 10 USDT</button>
+    <button class="btn-usdt" onclick="pagar(50)">Pagar 50 USDT</button>
+    <button class="btn-usdt" onclick="pagar(100)">Pagar 100 USDT</button>
+    <button class="btn-usdt" onclick="pagar(1000)">Pagar 1000 USDT</button>
+    <button class="btn-usdt" onclick="pagar(3000)">Pagar 3000 USDT</button>
 </div>
 
 <script>
-    // Si esto se ve de colores en tu editor, vas por buen camino
+    // 5. LA LÓGICA (El cerebro)
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://tu-sitio.com/tonconnect-manifest.json',
+        // IMPORTANTE: Si esta URL no existe, el botón NO APARECE
+        manifestUrl: 'https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/uniloc/public/tonconnect-manifest.json',
         buttonRootId: 'ton-connect-button'
     });
 
     async function pagar(monto) {
-        console.log("Iniciando pago de: " + monto + " USDT");
-        
         if (!tonConnectUI.connected) {
-            alert("Error: La Wallet no está conectada.");
+            alert("Compañero, primero conecta tu billetera en el botón azul de arriba.");
             return;
         }
-
-        // Aquí la lógica para Web3/USDT que ya tenemos
-        alert("Procesando pago de " + monto + " USDT en la red TON...");
+        alert("Iniciando pago de " + monto + " USDT...");
+        // Aquí irá el envío real una vez aparezca el botón
     }
 </script>
 
