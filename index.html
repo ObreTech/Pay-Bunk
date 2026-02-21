@@ -5,114 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pay Bunk Staking</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    
     <style>
-        body { font-family: sans-serif; background-color: #0f172a; color: white; text-align: center; padding-top: 50px; }
-        .card { background: #1e293b; border-radius: 20px; padding: 30px; margin: auto; max-width: 350px; border: 1px solid #334155; }
-        h1 { color: #38bdf8; }
-        #ton-connect-button { display: flex; justify-content: center; margin: 20px 0; }
+        body { font-family: sans-serif; background-color: #0f172a; color: white; text-align: center; padding: 50px 20px; }
+        .card { background: #1e293b; border-radius: 20px; padding: 30px; margin: auto; max-width: 350px; border: 1px solid #334155; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        h1 { color: #38bdf8; margin-bottom: 5px; }
+        #ton-connect-button { display: flex; justify-content: center; margin: 20px 0; min-height: 40px; }
+        .contenedor-pagos { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        .btn-usdt { background-color: #0088cc; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-usdt:hover { background-color: #005580; transform: scale(1.02); }
     </style>
 </head>
-<script>
-    // Primero definimos la función para que el botón la encuentre sí o sí
-    async function prepararPago(monto) {
-        try {
-            if (!tonConnectUI.connected) {
-                await tonConnectUI.openModal();
-            } else {
-                const transaction = {
-                    validUntil: Math.floor(Date.now() / 1000) + 600,
-                    messages: [{
-                        address: 'EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L',
-                        amount: '60000000',
-                        payload: 'te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA'
-                    }]
-                };
-                await tonConnectUI.sendTransaction(transaction);
-            }
-        } catch (e) {
-            alert('Error técnico: ' + e.message);
-        }
-    }
+<body>
 
-    // Luego inicializamos la billetera
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
-        buttonRootId: 'ton-connect-button'
-    });
-</script><body>
     <div class="card">
         <h1>🚀 PAY BUNK</h1>
-        <p>Staking de USDT</p>
+        <p style="color: #94a3b8;">Staking de USDT</p>
+        
         <div id="ton-connect-button"></div>
-        <p style="font-size: 12px; color: #94a3b8;">Conecta tu billetera para empezar</p>
+
+        <div class="contenedor-pagos">
+            <button class="btn-usdt" onclick="ejecutarPago(10)">Invertir 10 USDT</button>
+            <button class="btn-usdt" onclick="ejecutarPago(50)">Invertir 50 USDT</button>
+            <button class="btn-usdt" onclick="pagar(100)">Invertir 100 USDT</button>
+            <button class="btn-usdt" onclick="pagar(1000)">Invertir 1000 USDT</button>
+            <button class="btn-usdt" onclick="pagar(3000)">Invertir 3000 USDT</button>
+        </div>
+        
+        <p style="font-size: 11px; color: #64748b; margin-top: 20px;">Solo USDT (Red TON)</p>
     </div>
+
     <script>
+        // 2. INICIALIZACIÓN ÚNICA
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://pay-bunk.vercel.app/tonconnect-manifest.json',
-buttonRootId: 'ton-connect-button'
-    });
+            manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-button'
+        });
 
-   // Configuración de pagos para USDT
-    const MY_WALLET = "UQCT67yhgE0nbSjW-yTIcOp-KJtcT7h1ebc1Sr0EK7Tn8Vic";
-    const USDT_CONTRACT = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
-</script>
+        // 3. FUNCIÓN DE PAGO CORREGIDA
+        async function pagar(monto) {
+            if (!tonConnectUI.connected) {
+                alert("Compañero, primero conecta tu billetera arriba.");
+                await tonConnectUI.openModal();
+                return;
+            }
 
-<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+            alert("Vas a enviar " + monto + " USDT. Confirma en tu billetera.");
 
-<style>
-    #ton-connect-button { 
-        margin-bottom: 20px; 
-        display: flex; 
-        justify-content: center; 
-    }
-    .contenedor-pagos {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        max-width: 300px;
-        margin: 0 auto;
-    }
-    .btn-usdt {
-        background-color: #0088cc; /* Azul TON */
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background 0.3s;
-    }
-    .btn-usdt:hover { background-color: #005580; }
-</style>
+            // Aquí configuraremos el contrato de USDT real en el siguiente paso
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 300,
+                messages: [{
+                    address: 'UQCT67yhgE0nbSjW-yTIcOp-KJtcT7h1ebc1Sr0EK7Tn8Vic', // Tu Wallet
+                    amount: "50000000", // Fee de red
+                }]
+            };
 
-<div id="ton-connect-button"></div>
-
-<div class="contenedor-pagos">
-    <button class="btn-usdt" onclick="pagar(10)">Pagar 10 USDT</button>
-    <button class="btn-usdt" onclick="pagar(50)">Pagar 50 USDT</button>
-    <button class="btn-usdt" onclick="pagar(100)">Pagar 100 USDT</button>
-    <button class="btn-usdt" onclick="pagar(1000)">Pagar 1000 USDT</button>
-    <button class="btn-usdt" onclick="pagar(3000)">Pagar 3000 USDT</button>
-</div>
-
-<script>
-    // 5. LA LÓGICA (El cerebro)
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        // IMPORTANTE: Si esta URL no existe, el botón NO APARECE
-        manifestUrl: 'https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/uniloc/public/tonconnect-manifest.json',
-        buttonRootId: 'ton-connect-button'
-    });
-
-    async function pagar(monto) {
-        if (!tonConnectUI.connected) {
-            alert("Compañero, primero conecta tu billetera en el botón azul de arriba.");
-            return;
+            try {
+                await tonConnectUI.sendTransaction(transaction);
+            } catch (e) {
+                console.error(e);
+            }
         }
-        alert("Iniciando pago de " + monto + " USDT...");
-        // Aquí irá el envío real una vez aparezca el botón
-    }
-</script>
 
+        // Alias para que funcionen todos los botones
+        function ejecutarPago(m) { pagar(m); }
+    </script>
+</body>
+</html>
 
 
 
