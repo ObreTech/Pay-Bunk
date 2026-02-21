@@ -66,6 +66,8 @@ buttonRootId: 'ton-connect-button'
 
 <div id="ton-connect-button" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
 
+<div id="ton-connect-button" style="display: flex; justify-content: center; padding: 20px;"></div>
+
 <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
     <button onclick="prepararPago(10)">10 USDT</button>
     <button onclick="prepararPago(50)">50 USDT</button>
@@ -75,39 +77,48 @@ buttonRootId: 'ton-connect-button'
 </div>
 
 <script>
-    // Primero encendemos el motor (Esto hará que el botón azul aparezca)
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
-        buttonRootId: 'ton-connect-button'
-    });
+    // Usamos 'var' para que la variable exista desde el segundo 0
+    var tonConnectUI;
 
-    // Ahora definimos qué hacen los botones de USDT
+    // Esta función se encarga de crear el botón apenas carga la página
+    function iniciarBilletera() {
+        tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-button'
+        });
+    }
+
+    // Ejecutamos la carga inmediatamente
+    iniciarBilletera();
+
+    // Función para los pagos
     async function prepararPago(monto) {
+        if (!tonConnectUI) {
+            alert("El sistema se está iniciando. Por favor espera 3 segundos.");
+            return;
+        }
+
         if (!tonConnectUI.connected) {
-            alert("Primero conecta tu billetera con el botón azul arriba.");
+            alert("Por favor, conecta tu billetera primero con el botón azul.");
             tonConnectUI.openModal();
             return;
         }
 
-        alert("Abriendo billetera para invertir " + monto + " USDT...");
-
-        const tx = {
-            validUntil: Math.floor(Date.now() / 1000) + 600,
-            messages: [{
-                address: "EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L", // Contrato USDT
-                amount: "60000000", // Gas en TON
-                payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
-            }]
-        };
-
         try {
-            await tonConnectUI.sendTransaction(tx);
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [{
+                    address: "EQCxE6mNZhf9pQH9hN-v37L6-yR-R68zM5K-L2o2B-p-1m-L", // Tu contrato USDT
+                    amount: "60000000", // Gas
+                    payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
+                }]
+            };
+            await tonConnectUI.sendTransaction(transaction);
         } catch (e) {
             alert("Error: " + e.message);
         }
     }
 </script>
-
 
 
 
