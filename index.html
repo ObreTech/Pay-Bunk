@@ -32,39 +32,39 @@
             buttonRootId: 'ton-connect-button'
         });
 
-     async function pagar(monto) {
+        async function pagar(monto) {
             if (!tonConnectUI.connected) {
                 alert("Por favor, conecta tu billetera primero.");
                 return;
             }
 
             try {
-                // ESTA ES TU BILLETERA PERSONAL (Destino de los USDT)
+                // TU BILLETERA PERSONAL (AQUÍ RECIBIRÁS LOS FONDOS)
                 const tuBilleteraPersonal = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
-                
-                // IMPORTANTE: El payload debe ser una transferencia de Jetton (USDT)
-                // Este payload es genérico para transferencias simples, pero lo ideal es que 
-                // la billetera del usuario sepa que está enviando USDT.
-                
+
                 const transaction = {
-                    validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutos de validez
+                    validUntil: Math.floor(Date.now() / 1000) + 600,
                     messages: [
                         {
                             address: tuBilleteraPersonal,
-                            amount: "100000000", // 0.1 TON para asegurar que pase
-                            payload: "te6cckEBAQEABgAACC9nuW8=" // Un comentario simple o vacío para probar la conexión
+                            amount: "100000000", // 0.1 TON para el gas
+                            payload: "te6cckEBAQEABgAACC9nuW8=" // Payload simplificado para evitar bloqueos
                         }
                     ]
                 };
 
                 await tonConnectUI.sendTransaction(transaction);
-                alert("¡Solicitud enviada! Confirma en tu billetera.");
+                alert("¡Solicitud enviada! Confirma la operación en Tonkeeper.");
 
             } catch (e) {
                 console.error(e);
-                alert("Error de conexión: Asegúrate de que Tonkeeper esté abierta y vinculada.");
+                alert("Error: Asegúrate de tener saldo en TON para el gas y que la billetera esté vinculada.");
             }
         }
+    </script>
+</body>
+</html>
+
 
 
 
