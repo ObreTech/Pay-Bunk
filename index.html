@@ -8,66 +8,72 @@
     <style>
         body { font-family: sans-serif; background-color: #0f172a; color: white; text-align: center; padding: 40px 20px; }
         .card { background: #1e293b; border-radius: 20px; padding: 30px; margin: auto; max-width: 350px; border: 1px solid #334155; }
-        h1 { color: #38bdf8; font-size: 24px; }
-        #ton-connect-button { display: flex; justify-content: center; margin: 20px 0; }
-        .contenedor-pagos { display: flex; flex-direction: column; gap: 10px; }
-        .btn-usdt { background-color: #0088cc; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        h1 { color: #38bdf8; font-size: 26px; margin-bottom: 5px; }
+        #ton-connect-button { display: flex; justify-content: center; margin: 25px 0; min-height: 44px; }
+        .contenedor-pagos { display: flex; flex-direction: column; gap: 12px; }
+        .btn-usdt { background-color: #0088cc; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-usdt:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
     <div class="card">
         <h1>🚀 PAY BUNK</h1>
-        <p>Staking USDT</p>
+        <p style="color: #94a3b8;">Inversión en USDT</p>
+        
         <div id="ton-connect-button"></div>
+
         <div class="contenedor-pagos">
-            <button class="btn-usdt" onclick="enviarPago(10)">Invertir 10 USDT</button>
-            <button class="btn-usdt" onclick="enviarPago(50)">Invertir 50 USDT</button>
-            <button class="btn-usdt" onclick="enviarPago(100)">Invertir 100 USDT</button>
-            <button class="btn-usdt" onclick="enviarPago(1000)">Invertir 1000 USDT</button>
-            <button class="btn-usdt" onclick="enviarPago(3000)">Invertir 3000 USDT</button>
+            <button class="btn-usdt" onclick="ejecutarPago(10)">Invertir 10 USDT</button>
+            <button class="btn-usdt" onclick="ejecutarPago(50)">Invertir 50 USDT</button>
+            <button class="btn-usdt" onclick="ejecutarPago(100)">Invertir 100 USDT</button>
+            <button class="btn-usdt" onclick="ejecutarPago(1000)">Invertir 1000 USDT</button>
+            <button class="btn-usdt" onclick="ejecutarPago(3000)">Invertir 3000 USDT</button>
         </div>
     </div>
 
-   <script src="https://unpkg.com/tonweb@latest/dist/tonweb.js"></script>
-<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <script>
+        // Inicialización básica
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-button'
+        });
 
-<script>
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
-        buttonRootId: 'ton-connect-button'
-    });
+        async function ejecutarPago(monto) {
+            console.log("Presionado botón de: " + monto);
+            
+            if (!tonConnectUI.connected) {
+                alert("Por favor, conecta tu billetera arriba.");
+                return;
+            }
 
-    async function pagar(monto) {
-        if (!tonConnectUI.connected) {
-            alert("Conecta tu billetera primero.");
-            return;
+            // Dirección del contrato Maestro de USDT (Sin espacios)
+            const contratoUSDT = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
+
+            const transaccion = {
+                validUntil: Math.floor(Date.now() / 1000) + 360,
+                messages: [
+                    {
+                        address: contratoUSDT,
+                        amount: "50000000", // 0.05 TON para el gas
+                        // Instrucción de envío para USDT
+                        payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
+                    }
+                ]
+            };
+
+            try {
+                await tonConnectUI.sendTransaction(transaccion);
+                alert("Solicitud de " + monto + " USDT enviada. Confirma en tu billetera.");
+            } catch (error) {
+                console.error(error);
+                alert("La operación no se pudo completar: " + error.message);
+            }
         }
+    </script>
+</body>
+</html>
 
-        // Dirección del contrato USDT en formato HEX puro (Inmune a errores de validación)
-        // Este es el ID real del contrato USDT Master en la red TON
-        const USDT_CONTRACT_HEX = "0:c413a98d66177da4fe17dfbe3ec7efdfdc7e47af333333333333333333333333";
-
-        const transaction = {
-            validUntil: Math.floor(Date.now() / 1000) + 300,
-            messages: [{
-                address: USDT_CONTRACT_HEX, // Usamos HEX para saltar la validación de texto
-                amount: "50000000", // 0.05 TON para el gas
-                // Este payload es la instrucción técnica de transferencia de USDT
-                payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
-            }]
-        };
-
-        try {
-            await tonConnectUI.sendTransaction(transaction);
-            alert("¡Inversión de " + monto + " USDT procesada!");
-        } catch (e) {
-            console.error(e);
-            // El cartel ahora mostrará el error crudo si el SDK vuelve a fallar
-            alert("Estado de red: " + e.message);
-        }
-    }
-</script>
 
 
 
