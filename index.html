@@ -11,43 +11,64 @@
     <div style="background: #1e293b; border-radius: 20px; padding: 30px; margin: auto; max-width: 350px; border: 1px solid #334155;">
         <h1>🚀 PAY BUNK</h1>
         <p>Inversión en USDT (Red TON)</p>
+        
         <div id="ton-connect-button" style="display: flex; justify-content: center; margin: 25px 0;"></div>
         
-        <button class="btn" onclick="pagarDirecto(10)">Invertir 10 USDT</button>
-        <button class="btn" onclick="pagarDirecto(50)">Invertir 50 USDT</button>
-        <button class="btn" onclick="pagarDirecto(100)">Invertir 100 USDT</button>
-        <button class="btn" onclick="pagarDirecto(1000)">Invertir 1000 USDT</button>
-        <button class="btn" onclick="pagarDirecto(3000)">Invertir 3000 USDT</button>
+        <button class="btn" onclick="ejecutarInversion(10)">Invertir 10 USDT</button>
+        <button class="btn" onclick="ejecutarInversion(50)">Invertir 50 USDT</button>
+        <button class="btn" onclick="ejecutarInversion(100)">Invertir 100 USDT</button>
+        <button class="btn" onclick="ejecutarInversion(1000)">Invertir 1000 USDT</button>
+        <button class="btn" onclick="ejecutarInversion(3000)">Invertir 3000 USDT</button>
     </div>
 
     <style>
-        .btn { background-color: #0088cc; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px; font-size: 16px; }
+        .btn { background-color: #0088cc; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 10px; font-size: 16px; transition: 0.3s; }
         .btn:hover { background-color: #00aaff; }
     </style>
 
     <script>
+        // Configuración del botón de conexión
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
         });
 
-        function pagarDirecto(monto) {
-            // Dirección del contrato USDT y tu billetera destino (en formato Base64 limpio)
-            const contratoUSDT = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
-            const payload = "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA";
-            
-            // Creamos el link directo que abre Tonkeeper o cualquier billetera TON
-            // Esto no depende de las validaciones del navegador
-            const tonTransferUrl = ton://transfer/${contratoUSDT}?amount=100000000&bin=${payload};
+        async function ejecutarInversion(monto) {
+            // Verificamos si la billetera está conectada
+            if (!tonConnectUI.connected) {
+                alert("Por favor, toca el botón azul de 'Connect Wallet' arriba antes de invertir.");
+                return;
+            }
 
-            // Si el usuario está en móvil, abre la app. Si está en PC, intenta abrir la extensión o muestra el link.
-            window.location.href = tonTransferUrl;
-            
-            alert("Abriendo tu billetera para invertir " + monto + " USDT...");
+            const contratoUSDT = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
+            const miPayload = "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA";
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 360,
+                messages: [
+                    {
+                        address: contratoUSDT,
+                        amount: "100000000", // 0.1 TON para gas
+                        payload: miPayload
+                    }
+                ]
+            };
+
+            try {
+                // Esto abrirá Tonkeeper automáticamente
+                await tonConnectUI.sendTransaction(transaction);
+                alert("¡Solicitud enviada! Abre Tonkeeper para confirmar tu inversión de " + monto + " USDT.");
+            } catch (e) {
+                console.error(e);
+                // Si falla por el formato, usamos el plan de respaldo automático
+                const directLink = ton://transfer/${contratoUSDT}?amount=100000000&bin=${miPayload};
+                window.location.href = directLink;
+            }
         }
     </script>
 </body>
 </html>
+
 
 
 
