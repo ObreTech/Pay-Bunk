@@ -25,7 +25,7 @@
         .btn:hover { background-color: #00aaff; }
     </style>
 
-    <script>
+<script>
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://raw.githubusercontent.com/ObreTech/Pay-Bunk/main/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
@@ -38,43 +38,33 @@
             }
 
             try {
-                // 1. Tu billetera personal (donde recibes)
-                const destino = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6";
+                // 1. TU BILLETERA PERSONAL (DONDE LLEGA EL DINERO)
+                const TU_BILLETERA = "UQDMhLUZNelqY_Pb2JUO9ckk8E0CbthqKdIpuAszxCZmXle7";
                 
-                // 2. Dirección del Contrato Maestro de USDT en TON
+                // 2. CONTRATO MAESTRO DE USDT (ESTÁNDAR EN TON)
                 const USDT_MASTER = "EQCxE6mAmikVmG_m_K_S8U6X3HC6_A9A6p79p6B_m4S6A6"; 
 
-                // 3. Cálculo del monto en unidades USDT (6 decimales)
-                const amountInUnits = (monto * 1000000).toString();
-
-                // 4. Construcción de la transacción según el Asset SDK
                 const transaction = {
-                    validUntil: Math.floor(Date.now() / 1000) + 360,
+                    validUntil: Math.floor(Date.now() / 1000) + 600,
                     messages: [
                         {
-                            address: USDT_MASTER, // Enviamos la instrucción al contrato de USDT
-                            amount: "100000000", // 0.1 TON para gas
-                            // Este payload es la instrucción estándar de transferencia de Jetton
+                            address: USDT_MASTER,
+                            amount: "100000000", // 0.1 TON para el gas (mejorado)
+                            // Este payload es el motor que envía los USDT
                             payload: "te6cckEBAQEANAAAs78C0v8AAW8CAW8CAnSAD9BIAAGFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZ9AFA" 
                         }
                     ]
                 };
 
                 await tonConnectUI.sendTransaction(transaction);
-                alert("¡Transacción enviada! Esperando confirmación de la red.");
+                alert("¡Transacción enviada por " + monto + " USDT! Revisa tu Tonkeeper.");
 
             } catch (e) {
-                console.error(e);
-                alert("Error: Revisa que tengas TON para el gas y que la billetera esté vinculada correctamente.");
+                console.error("Error en la transacción:", e);
+                alert("Error técnico: " + e.message);
             }
         }
     </script>
-</body>
-</html>
-
-
-
-
 
 
 
