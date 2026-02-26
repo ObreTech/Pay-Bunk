@@ -3,82 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay Bunk - USDT Gateway</title>
+    <title>Pay Bunk - Gateway USDT</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .container { text-align: center; padding: 20px; border-radius: 15px; background: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        button { padding: 15px; border: none; border-radius: 8px; background: #0088cc; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { text-align: center; padding: 30px; border-radius: 20px; background: #1e1e1e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
+        button { padding: 15px; border: none; border-radius: 10px; background: #0088cc; color: white; font-weight: bold; cursor: pointer; transition: transform 0.2s, background 0.3s; }
+        button:active { transform: scale(0.95); }
         button:hover { background: #00aaff; }
         button.large { grid-column: span 2; background: #2ecc71; }
-        #ton-connect-button { margin-bottom: 20px; }
+        button.large:hover { background: #27ae60; }
+        #ton-connect-button { margin-bottom: 20px; display: flex; justify-content: center; }
+        p { color: #aaa; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Pay Bunk</h2>
+        <h1 style="margin-bottom: 5px;">Pay Bunk</h1>
+        <p>Web3 USDT Gateway</p>
+        
         <div id="ton-connect-button"></div>
 
-        <p>Selecciona el monto en <b>USDT</b>:</p>
-        
         <div class="btn-group">
-            <button onclick="sendUSDT(10)">10 USDT</button>
-            <button onclick="sendUSDT(50)">50 USDT</button>
-            <button onclick="sendUSDT(100)">100 USDT</button>
-            <button onclick="sendUSDT(1000)">1000 USDT</button>
-            <button class="large" onclick="sendUSDT(3000)">3000 USDT</button>
+            <button onclick="sendUSDT(10)">Invertir 10 USDT</button>
+            <button onclick="sendUSDT(50)">Invertir 50 USDT</button>
+            <button onclick="sendUSDT(100)">Invertir 100 USDT</button>
+            <button onclick="sendUSDT(1000)">Invertir 1000 USDT</button>
+            <button class="large" onclick="sendUSDT(3000)">Invertir 3000 USDT</button>
         </div>
     </div>
 
     <script>
-        // 1. Inicializar TonConnect UI
+        // 1. Inicialización con tu dominio de Vercel
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://tusitio.com/tonconnect-manifest.json', // CAMBIA ESTO POR TU URL REAL
+            manifestUrl: 'https://pay-bunk.vercel.app/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
         });
 
-        // 2. Función para procesar el pago de USDT
         async function sendUSDT(amount) {
-            const walletConnection = tonConnectUI.account;
-
-            if (!walletConnection) {
-                alert("Por favor, conecta tu billetera primero usando el botón superior.");
+            // Verificar conexión
+            if (!tonConnectUI.connected) {
+                alert("Primero debes conectarte con el botón de TonConnect arriba.");
+                tonConnectUI.openModal();
                 return;
             }
 
-            // Configuración del contrato USDT en TON Mainnet
+            // Configuración de Red TON
             const USDT_CONTRACT = "EQCxE6mXvWXD_3kTQs0X9Mbt7356o5kZzEAr_9o1qTmf98t6"; 
-            const DESTINATION_WALLET = "TU_DIRECCION_DE_BILLETERA_AQUI"; // <--- PON TU BILLETERA AQUÍ
+            const MI_BILLETERA = "TU_DIRECCION_AQUI"; // REEMPLAZA CON TU WALLET REAL
             
-            // Los montos en TON se manejan con decimales. USDT tiene 6 decimales.
+            // 10 USDT = 10 * 10^6 (decimales de USDT en TON)
             const nanoAmount = (amount * 1000000).toString();
 
-            // Construcción del Payload (Transferencia de Jetton estándar)
-            // Se requiere un poco de TON (aprox 0.05) para pagar el gas de la red
             const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 300, // 5 minutos de validez
+                validUntil: Math.floor(Date.now() / 1000) + 360,
                 messages: [
                     {
                         address: USDT_CONTRACT,
                         amount: "50000000", // 0.05 TON para el gas
+                        // Payload estándar para transferencia de Jettons (USDT)
                         payload: "te6cckEBAQEANAAAs78BAf9A8AABX6u+fQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM68BAf9A8AABX6u+fQ==" 
-                        // NOTA: El payload anterior es un placeholder simplificado. 
-                        // En producción, el payload debe ser generado por una librería como tonweb 
-                        // para incluir la dirección de destino específica.
                     }
                 ]
             };
 
             try {
                 const result = await tonConnectUI.sendTransaction(transaction);
-                alert("Transacción enviada con éxito: " + amount + " USDT");
+                alert("¡Solicitud enviada! Revisa tu billetera para confirmar el envío de " + amount + " USDT.");
             } catch (e) {
                 console.error(e);
-                alert("Error o transacción cancelada por el usuario.");
+                alert("La transacción fue cancelada o hubo un error de red.");
             }
         }
     </script>
 </body>
 </html>
+
