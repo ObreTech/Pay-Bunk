@@ -3,30 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay Bunk - Official Gateway</title>
+    <title>Pay Bunk - Gateway</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .container { text-align: center; padding: 30px; border-radius: 20px; background: #1e1e1e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; border: 1px solid #333; }
+        body { font-family: sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { text-align: center; padding: 30px; border-radius: 20px; background: #1e1e1e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
-        button { padding: 15px; border: none; border-radius: 10px; background: #0088cc; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; }
-        button:hover { background: #00aaff; transform: translateY(-2px); }
-        button:active { transform: translateY(0); }
-        button.large { grid-column: span 2; background: #2ecc71; font-size: 16px; }
-        button.large:hover { background: #27ae60; }
-        #ton-connect-button { margin-bottom: 25px; display: flex; justify-content: center; }
-        h1 { margin: 0 0 5px 0; font-size: 24px; color: #0088cc; }
-        p { margin: 0 0 20px 0; color: #888; font-size: 14px; }
+        button { padding: 15px; border: none; border-radius: 10px; background: #0088cc; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #00aaff; }
+        button.large { grid-column: span 2; background: #2ecc71; }
+        #ton-connect-button { margin-bottom: 20px; display: flex; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>Pay Bunk</h1>
-        <p>Inversiones Web3 (USDT)</p>
-        
         <div id="ton-connect-button"></div>
-
         <div class="btn-group">
             <button onclick="sendUSDT(10)">Invertir 10 USDT</button>
             <button onclick="sendUSDT(50)">Invertir 50 USDT</button>
@@ -39,44 +32,4 @@
     <script>
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://pay-bunk.vercel.app/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-button'
-        });
-
-       async function sendUSDT(amount) {
-    if (!tonConnectUI.connected) {
-        alert("Por favor, conecta tu billetera primero.");
-        tonConnectUI.openModal();
-        return;
-    }
-
-    const USDT_CONTRACT = "EQCxE6mXvWXD_3kTQs0X9Mbt7356o5kZzEAr_9o1qTmf98t6";
-    const MI_BILLETERA_RECEPCION = "UQCT67yhgE0nbSjW-yTIcOp-KJtcT7h1ebc1Sr0EK7Tn8Vic";
-    
-    // Monto de USDT (6 decimales)
-    const jettonAmount = BigInt(amount * 1000000).toString();
-
-    // Este es el Payload corregido específicamente para transferir USDT
-    // Estructura: OpCode 0xf8a7ea5 (transfer) + QueryID 0 + JettonAmount + Destinatario...
-    const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 360,
-        messages: [
-            {
-                address: USDT_CONTRACT,
-                amount: "80000000", // 0.08 TON para el Gas (esto soluciona el error de "saldo insuficiente" falso)
-                payload: "te6cckEBAQEANAAAs78BAf9A8AABX6u+fQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM68BAf9A8AABX6u+fQ==" 
-                // Si el error persiste, es necesario usar una librería como TonWeb para generar 
-                // el cuerpo del mensaje dinámicamente con tu dirección UQCT67...
-            }
-        ]
-    };
-
-    try {
-        console.log("Intentando enviar " + amount + " USDT a " + MI_BILLETERA_RECEPCION);
-        const result = await tonConnectUI.sendTransaction(transaction);
-        alert("¡Éxito! Transacción enviada. Revisa tu billetera para la confirmación final.");
-    } catch (e) {
-        console.error("Error detallado:", e);
-        // Este mensaje aparecerá si la billetera rechaza el formato del payload
-        alert("La billetera rechazó la transacción. Asegúrate de que la app de tu billetera esté actualizada.");
-    }
-}
+            buttonRootId
