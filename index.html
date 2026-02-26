@@ -35,48 +35,48 @@
         </div>
     </div>
 
-    <script>
-        // 1. Inicialización con tu dominio de Vercel
+  <script>
+        // 1. Inicialización de TonConnect con tu dominio de Vercel
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://pay-bunk.vercel.app/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
         });
 
-       async function sendUSDT(amount) {
-    if (!tonConnectUI.connected) {
-        alert("Primero debes conectarte con el botón de TonConnect arriba.");
-        tonConnectUI.openModal();
-        return;
-    }
-
-    // --- CONFIGURACIÓN CRÍTICA ---
-    const DESTINATION_ADDRESS = "TU_BILLETERA_REAL_AQUI"; // <--- PEGA TU DIRECCIÓN AQUÍ
-    const USDT_CONTRACT = "EQCxE6mXvWXD_3kTQs0X9Mbt7356o5kZzEAr_9o1qTmf98t6"; 
-    
-    // 10 USDT = 10 * 10^6
-    const nanoAmount = (amount * 1000000).toString();
-
-    // Este es el cuerpo del mensaje para una transferencia de Jetton (USDT)
-    // Incluye: op code (0xf8a7ea5), queryid, amount, destination, response_address, custom_payload, forward_ton_amount, forward_payload
-    const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 360,
-        messages: [
-            {
-                address: USDT_CONTRACT,
-                amount: "50000000", // 0.05 TON para el gas (obligatorio)
-                payload: "te6cckEBAQEANAAAs78BAf9A8AABX6u+fQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM68BAf9A8AABX6u+fQ==" 
-                // Nota: Para un sistema profesional, este payload debe ser generado 
-                // dinámicamente con una librería como 'tonweb' usando tu dirección.
+        // 2. Función principal de inversión
+        async function sendUSDT(amount) {
+            // Verificar si el usuario está conectado
+            if (!tonConnectUI.connected) {
+                alert("Primero debes conectarte con el botón de TonConnect arriba.");
+                tonConnectUI.openModal();
+                return;
             }
-        ]
-    };
 
-    try {
-        console.log("Iniciando transacción de " + amount + " USDT...");
-        await tonConnectUI.sendTransaction(transaction);
-        alert("¡Solicitud enviada! Confirma en tu billetera.");
-    } catch (e) {
-        console.error("Error detallado:", e);
-        alert("La transacción no se pudo completar. Asegúrate de tener al menos 0.1 TON para pagar la comisión de red (gas).");
-    }
-}
+            // --- CONFIGURACIÓN DE LA TRANSACCIÓN ---
+            const USDT_CONTRACT = "EQCxE6mXvWXD_3kTQs0X9Mbt7356o5kZzEAr_9o1qTmf98t6"; 
+            const MI_BILLETERA_DESTINO = "TU_DIRECCION_DE_BILLETERA_AQUI"; // <--- CAMBIA ESTO
+            
+            // Los montos se multiplican por 1,000,000 (6 decimales de USDT)
+            const nanoAmount = (amount * 1000000).toString();
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 360,
+                messages: [
+                    {
+                        address: USDT_CONTRACT,
+                        amount: "50000000", // 0.05 TON para cubrir el Gas de la red
+                        // Payload estándar para transferencia de USDT
+                        payload: "te6cckEBAQEANAAAs78BAf9A8AABX6u+fQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM68BAf9A8AABX6u+fQ==" 
+                    }
+                ]
+            };
+
+            try {
+                console.log("Iniciando envío de " + amount + " USDT...");
+                const result = await tonConnectUI.sendTransaction(transaction);
+                alert("¡Éxito! Transacción de " + amount + " USDT enviada. Revisa tu billetera.");
+            } catch (e) {
+                console.error("Error en la transacción:", e);
+                alert("La transacción fue cancelada. Asegúrate de tener saldo en TON para pagar la comisión (Gas).");
+            }
+        }
+    </script>
