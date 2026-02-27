@@ -3,68 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay Bunk Official</title>
+    <title>Pay Bunk - Inversión</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f0f0f; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .card { background: #1a1a1a; padding: 2rem; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; width: 90%; max-width: 350px; border: 1px solid #333; }
-        h1 { margin: 0 0 10px 0; color: #0088cc; font-size: 24px; }
-        p { color: #888; font-size: 14px; margin-bottom: 20px; }
-        
-        /* Contenedor del botón de conexión */
-        #ton-connect-button { display: flex; justify-content: center; margin-bottom: 25px; min-height: 40px; }
-
-        /* Estilo de los botones de inversión */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        button.plan { background: #242424; color: white; border: 1px solid #444; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button.plan:hover { background: #333; border-color: #0088cc; }
-        button.large { grid-column: span 2; background: #0088cc; border: none; font-size: 18px; }
-        button.large:hover { background: #00aaff; }
+        body { font-family: sans-serif; background: #0f0f0f; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .card { background: #1a1a1a; padding: 30px; border-radius: 24px; text-align: center; width: 90%; max-width: 350px; border: 1px solid #333; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        button { background: #0088cc; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; }
+        .btn-3000 { grid-column: span 2; background: #22c55e; }
+        #ton-connect-button { display: flex; justify-content: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-
     <div class="card">
         <h1>Pay Bunk</h1>
-        <p>Inversión Web3 Segura (USDT)</p>
-        
         <div id="ton-connect-button"></div>
-
         <div class="grid">
-            <button class="plan" onclick="pay(10)">10 USDT</button>
-            <button class="plan" onclick="pay(50)">50 USDT</button>
-            <button class="plan" onclick="pay(100)">100 USDT</button>
-            <button class="plan" onclick="pay(1000)">1000 USDT</button>
-            <button class="plan large" onclick="pay(3000)">Invertir 3000 USDT</button>
+            <button onclick="sendPAY(10)">10 USDT</button>
+            <button onclick="sendPAY(50)">50 USDT</button>
+            <button onclick="sendPAY(100)">100 USDT</button>
+            <button onclick="sendPAY(1000)">1000 USDT</button>
+            <button class="btn-3000" onclick="sendPAY(3000)">Invertir 3000 USDT</button>
         </div>
     </div>
 
     <script>
-        // Inicialización correcta de la conexión
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://pay-bunk.vercel.app/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
         });
 
-        async function pay(amount) {
-            // 1. Verificamos conexión
+        function sendPAY(amount) {
             if (!tonConnectUI.connected) {
-                alert("Primero haz clic en el botón azul para conectar tu Tonkeeper.");
                 tonConnectUI.openModal();
                 return;
             }
 
-            const walletDestino = "UQCT67yhgE0nbSjW-yTIcOp-KJtcT7h1ebc1Sr0EK7Tn8Vic";
-            const usdtContract = "EQCxE6mXvWXD_3kTQs0X9Mbt7356o5kZzEAr_9o1qTmf98t6";
+            // DATOS DE TUS CONTRATOS
+            const PAY_JETTON_WALLET = "EQBXnmpMN8VJqdILjioOZtAqE-AmB9ugHbyNDzd9UmJ1toKZ";
+            const SMART_CONTRACT_RECIBIDOR = "EQCcmm_Oh7Gl8Xd7WuJ-8k-Dp-zYLV3ahTS2RAQo3uT8kCLB";
 
-            // 2. Usamos el enlace directo (Deep Link) que es lo que Tonkeeper mejor entiende
-            // Esto evita errores de "saldo insuficiente" o "no se puede leer"
-            const amountInUnits = amount * 1000000;
-            const deepLink = https://app.tonkeeper.com/transfer/${walletDestino}?token=${usdtContract}&amount=${amountInUnits};
+            // Cálculo para 6 decimales (estándar de USDT/Jettons en DeDust)
+            const unidades = amount * 1000000;
+
+            // Este es el enlace "Deep Link" que Tonkeeper entiende como una orden de DeDust
+            // Es la vía más rápida y sin errores de código.
+            const link = https://app.tonkeeper.com/transfer/${SMART_CONTRACT_RECIBIDOR}?token=${PAY_JETTON_WALLET}&amount=${unidades};
             
-            // 3. Redirección
-            window.location.href = deepLink;
+            window.location.href = link;
         }
     </script>
 </body>
