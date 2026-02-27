@@ -1,58 +1,56 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay Bunk - Web3</title>
+    <title>Pay Bunk Official</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .container { text-align: center; padding: 30px; border-radius: 20px; background: #1e1e1e; border: 1px solid #333; width: 90%; max-width: 400px; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
-        button { padding: 15px; border: …
-[14:38, 27/2/2026] David: https://github.com/ton-connect/demo-dapp-react
-[14:42, 27/2/2026] David: <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay Bunk - Official</title>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .card { background: #1a1a1a; padding: 2rem; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; width: 350px; border: 1px solid #333; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        button { background: #0088cc; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #00aaff; transform: translateY(-2px); }
-        .btn-large { grid-column: span 2; background: #22c55e; height: 50px; font-size: 1.1rem; }
-        #ton-connect-button { margin-bottom: 20px; }
-        h1 { margin: 0; color: #0088cc; }
-        p { color: #888; font-size: 0.9rem; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f0f0f; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .card { background: #1a1a1a; padding: 2rem; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; width: 90%; max-width: 350px; border: 1px solid #333; }
+        h1 { margin: 0 0 10px 0; color: #0088cc; font-size: 24px; }
+        p { color: #888; font-size: 14px; margin-bottom: 20px; }
+        
+        /* Contenedor del botón de conexión */
+        #ton-connect-button { display: flex; justify-content: center; margin-bottom: 25px; min-height: 40px; }
+
+        /* Estilo de los botones de inversión */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button.plan { background: #242424; color: white; border: 1px solid #444; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button.plan:hover { background: #333; border-color: #0088cc; }
+        button.large { grid-column: span 2; background: #0088cc; border: none; font-size: 18px; }
+        button.large:hover { background: #00aaff; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <h1>Pay Bunk</h1>
-        <p>Inversión Web3 en USDT</p>
+        <p>Inversión Web3 Segura (USDT)</p>
+        
         <div id="ton-connect-button"></div>
+
         <div class="grid">
-            <button onclick="pay(10)">10 USDT</button>
-            <button onclick="pay(50)">50 USDT</button>
-            <button onclick="pay(100)">100 USDT</button>
-            <button onclick="pay(1000)">1000 USDT</button>
-            <button class="btn-large" onclick="pay(3000)">3000 USDT</button>
+            <button class="plan" onclick="pay(10)">10 USDT</button>
+            <button class="plan" onclick="pay(50)">50 USDT</button>
+            <button class="plan" onclick="pay(100)">100 USDT</button>
+            <button class="plan" onclick="pay(1000)">1000 USDT</button>
+            <button class="plan large" onclick="pay(3000)">Invertir 3000 USDT</button>
         </div>
     </div>
 
     <script>
+        // Inicialización correcta de la conexión
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://pay-bunk.vercel.app/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
         });
 
         async function pay(amount) {
+            // 1. Verificamos conexión
             if (!tonConnectUI.connected) {
+                alert("Primero haz clic en el botón azul para conectar tu Tonkeeper.");
                 tonConnectUI.openModal();
                 return;
             }
@@ -60,14 +58,14 @@
             const walletDestino = "UQCT67yhgE0nbSjW-yTIcOp-KJtcT7h1ebc1Sr0EK7Tn8Vic";
             const usdtContract = "EQCxE6mXvWXD_3kTQs0X9Mbt7356o5kZzEAr_9o1qTmf98t6";
 
-            // Para USDT, la forma más infalible hoy es usar la redirección directa de Tonkeeper
-            // Esto evita que el código falle y que la billetera haga todo el trabajo pesado.
-            const deepLink = https://app.tonkeeper.com/transfer/${walletDestino}?token=${usdtContract}&amount=${amount * 1000000};
+            // 2. Usamos el enlace directo (Deep Link) que es lo que Tonkeeper mejor entiende
+            // Esto evita errores de "saldo insuficiente" o "no se puede leer"
+            const amountInUnits = amount * 1000000;
+            const deepLink = https://app.tonkeeper.com/transfer/${walletDestino}?token=${usdtContract}&amount=${amountInUnits};
             
-            // Abrimos Tonkeeper con los datos listos
+            // 3. Redirección
             window.location.href = deepLink;
         }
     </script>
 </body>
 </html>
-
