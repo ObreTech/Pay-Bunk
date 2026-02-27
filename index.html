@@ -1,4 +1,16 @@
-<!DOCTYPE html>
+[15:41, 26/2/2026] David: <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay Bunk Web3</title>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { text-align: center; padding: 30px; border-radius: 20px; background: #1e1e1e; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 400px; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
+        button { padding:…
+[13:50, 27/2/2026] David: <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -29,7 +41,7 @@
     </div>
 
     <script>
-        // Esta es la parte que veías blanca, ahora está protegida
+        // Inicialización de TonConnect
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://pay-bunk.vercel.app/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
@@ -42,8 +54,13 @@
                 return;
             }
 
+            // Dirección de recepción (Tu wallet)
+            const DESTINO = "UQCT67yhgE0nbSjW-yTIcOp-KJtcT7h1ebc1Sr0EK7Tn8Vic";
+            // Contrato oficial de USDT en TON
             const USDT_CONTRACT = "EQCxE6mXvWXD_3kTQs0X9Mbt7356o5kZzEAr_9o1qTmf98t6";
-            const gasAmount = "85000000"; // 0.085 TON (Seguridad total para el Gas)
+            
+            // Subimos el Gas a 0.1 TON (100000000 nanoton) para evitar el error de saldo
+            const gasAmount = "100000000"; 
 
             const transaction = {
                 validUntil: Math.floor(Date.now() / 1000) + 360,
@@ -51,17 +68,19 @@
                     {
                         address: USDT_CONTRACT,
                         amount: gasAmount,
+                        // Este payload es una instrucción de transferencia genérica
+                        // Si vuelve a fallar, el siguiente paso es generar un payload dinámico
                         payload: "te6cckEBAQEANAAAs78BAf9A8AABX6u+fQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM68BAf9A8AABX6u+fQ=="
                     }
                 ]
             };
 
             try {
-                await tonConnectUI.sendTransaction(transaction);
-                alert("¡Transacción enviada! Confirma en tu App.");
+                const result = await tonConnectUI.sendTransaction(transaction);
+                alert("Transacción de " + amount + " USDT enviada con éxito.");
             } catch (e) {
-                console.error(e);
-                alert("Error: Revisa tus USDT y que tengas al menos 0.1 TON.");
+                console.error("Error detallado:", e);
+                alert("La billetera rechazó la operación. Verifica que tengas USDT en la red TON (Mainnet) y no en otra red.");
             }
         }
     </script>
